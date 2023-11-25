@@ -17,10 +17,10 @@ void append(Monkey *head, Monkey *mon){
 }
 
 
-void postorder(Monkey *v, std::string &output){ 
+void preorder(Monkey *v, std::string &output){ 
     output+=v->name;
     for(size_t i=0; i <v->kids.size(); i++){
-        postorder(v->kids[i], output);
+        preorder(v->kids[i], output);
     }
 }
 
@@ -61,7 +61,7 @@ int main(){
             append(currHead, mon);
             que.push(mon);
         }
-        postorder(head, output);
+        preorder(head, output);
         fOutput[i] = output;
 
         //clearing

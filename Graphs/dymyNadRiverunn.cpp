@@ -1,52 +1,39 @@
 #include <iostream>
-#include <string>
 #include <queue>
 #include <vector>
-#include <list>
 #include <algorithm>
 
+void BFS(std::vector<std::vector<int> > graph, int n, int s, int d){
+  bool visited[n];
+  std::fill(visited, visited + n, false);
 
-void BFS(std::vector<std::vector<int> > graph, int n,  int s, int days){
-    std::queue<int> que;
-    bool visited[n];
-    std::fill(visited, visited + n, 0);
+  std::queue<int> que;
 
-    int counter = 0;
-    int dist = 0;
+  que.push(s);
+  visited[s] = true;
 
-    if (graph[s].size()!= 0) {                                //if castle has no roads EDGE CASE
-        que.push(s);   
-        visited[s] = true;
-    }   else {                                                    //no crows were send no one will come
-        std::cout << 0 << " " << 0; 
-        return;
-    }                          
-    
-    while (!que.empty()){
-        int head = que.front();
-        int size = graph[head].size();
-        que.pop();
-        
-        bool change = false;
-        for (int j = 0; j < size; j++)
-        {
-            int val = graph[head][j];
+  int maxDist = 0;
+  int dist = 0;
+  while (!que.empty()){
+    bool change = false;
+    int head = que.front();
+    int edges = graph[head].size();
+    que.pop();
 
-            if (!visited[val]){
-                change = true;
-                visited[val] = true;
-                que.push(val);
-                if (dist<days/2)
-                    ++counter;
-            }
-        }
-        if (change)
-            ++dist;
+    for (int i = 0; i < edges; i++){
+      int value = graph[head][i];
+
+      if (!visited[value]){
+        visited[value] = true;
+        que.push(value);
+        change = true;
+        if (maxDist < d/2) ++dist;
+      }
     }
-
-    std::cout << dist << " " << counter;
+    if (change) ++maxDist;
+  }
+  std::cout << maxDist << " " <<  dist;
 }
-
 
 int main(){
     std::ios_base::sync_with_stdio(false);
@@ -58,13 +45,14 @@ int main(){
     std::vector<std::vector<int> > graph(n);
 
     for(int i = 0; i < m; i++){ 
-        int cas1, cas2;
-        std::cin >> cas1 >> cas2; std::cin.ignore();
-        graph[cas1].push_back(cas2);
-        graph[cas2].push_back(cas1);
+        int a, b;
+        std::cin >> a >> b;
+        graph[a].push_back(b);
+        graph[b].push_back(a);
     } 
- 
+
     BFS(graph, n, s, d);
+ 
 
 
     return 0;
