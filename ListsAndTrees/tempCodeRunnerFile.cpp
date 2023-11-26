@@ -1,12 +1,12 @@
 #include <iostream>
-#include <string>
+#include <queue>
 
 template <typename T>
 class Stack {
 private:
-    T* elements;    
-    size_t capacity; 
-    size_t size;     
+    T* elements;    // Tablica dynamiczna do przechowywania elementów
+    size_t capacity; // Pojemność tablicy
+    size_t size;     // Aktualny rozmiar stosu
 
 public:
     Stack() : capacity(10), size(0) {
@@ -19,6 +19,7 @@ public:
 
     void push(const T& value) {
         if (size == capacity) {
+            // Jeżeli stos jest pełny, zwiększ pojemność
             resize();
         }
         elements[size++] = value;
@@ -58,6 +59,7 @@ private:
     }
 };
 
+
 class Queue{
     private:
         char *tab;
@@ -70,14 +72,13 @@ class Queue{
             tab = new char[size];
         }
 
+        ~Queue(){
+            delete[]tab;
+        }
+
         bool empty(){
             return head == tail ? true : false;
         }
-
-        void deallocateMemory() {
-        delete[] tab;
-        }
-
 
         char pop(){
             char temp = tab[head];
@@ -111,6 +112,7 @@ class Queue{
             head = tail = 0;
         }
 };
+
 
 void infToRPN(std::string string, Queue &que) {
     Stack<char> stack;
@@ -207,7 +209,7 @@ double RPNToInt(Queue que) {
                 else
                     break;
             }
-            double numericValue = std::stod(a); 
+            double numericValue = std::stod(a);  // Convert the string to a numeric value
             stack.push(numericValue);
         } else {
             if (e == '+') {
@@ -229,7 +231,7 @@ double RPNToInt(Queue que) {
                 stack.pop();
                 double valA = stack.top();
                 stack.pop();
-                double result = valA / valB; 
+                double result = valA / valB;  // Corrected division operation
                 stack.push(result);
             } else if (e == '-') {
                 double valB = stack.top();
@@ -241,6 +243,7 @@ double RPNToInt(Queue que) {
             }
         }
     }
+
     return stack.top();
 }
 
@@ -251,7 +254,7 @@ int main() {
     int n;
     std::cin >> n;
     std::cin.ignore();
-    std::string string;
+    std::string string, rpn;
     Queue que[n];
 
     for (int i = 0; i < n; i++) {
@@ -261,11 +264,12 @@ int main() {
     for (int i = 0; i < n; i++){
         if (que[i].empty()){
             std::cout << "BLAD";
-        }else
+        }else{
             std::cout << RPNToInt(que[i]);
+        }
         std::cout << "\n";
-        que[i].deallocateMemory();
     }
 
     return 0;
 }
+
