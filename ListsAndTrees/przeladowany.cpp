@@ -3,49 +3,63 @@
 #include <queue>
 #include <stack>
 
-bool infToRPN(std::string string, std::queue<char> &que) {
+bool toRPN(std::string string, std::queue<char> &que) {
     std::stack<char> stack;
     int i = 0;
     int size = string.size();
     
     while (i != size) {
-        char e = string.at(i);
+        char e = string[i];
 
         if (isdigit(e)){
             que.push(e);
-            if (i < size - 1)
+            if (!isdigit(string[i+1]))
             {
-                bool changed = false;
-                while (isdigit(string.at(i+1))) 
-                {
-                    que.push(string.at(i+1));
-                    ++i;
-                    changed = true;
-                }    
-                if (changed)
-                    --i;
+                que.push(';');
             }
-            que.push(';');
         }
             
         else if (e == '[' || e == '{' || e == '(')
             stack.push(e);
-        else if (e == ']' || e == '}' || e == ')') {
-            while (!stack.empty() && stack.top() != '[' && stack.top() != '{' && stack.top() != '(') {
+        else if (e == ']' ){
+            while (!stack.empty() && stack.top() != '[')
+            {
                 que.push(stack.top());
                 stack.pop();
             }
-            if (stack.empty() || stack.top() != '[' && stack.top() != '{' && stack.top() != '('){
+            if (stack.empty() || stack.top() != '['){
                 return false;
             }
             stack.pop();
-        } else if (e == '+' || e == '-') {
+        }
+        else if (e == '}' ){
+            while (!stack.empty() && stack.top() != '{')
+            {
+                que.push(stack.top());
+                stack.pop();
+            }
+            if (stack.empty() || stack.top() != '{'){
+                return false;
+            }
+            stack.pop();
+        }
+        else if (e == ')' ){
+            while (!stack.empty() && stack.top() != '(')
+            {
+                que.push(stack.top());
+                stack.pop();
+            }
+            if (stack.empty() || stack.top() != '('){
+                return false;
+            }
+            stack.pop();
+        }else if (e == '+' || e == '-') {
             while (!stack.empty() && stack.top() != '[' && stack.top() != '{' && stack.top() != '(') {
                 que.push(stack.top());
                 stack.pop();
             }
             stack.push(e);
-        } else if (e == '*' || e == '/') {
+        }else if (e == '*' || e == '/') {
             while (!stack.empty() && (stack.top() == '*' || stack.top() == '/')) {
                 que.push(stack.top());
                 stack.pop();
@@ -54,7 +68,6 @@ bool infToRPN(std::string string, std::queue<char> &que) {
         }
         ++i;
     }
-
     while (!stack.empty()) {
         if (stack.top() == '[' || stack.top() == '{' || stack.top() == '(')
             return false;
@@ -65,7 +78,7 @@ bool infToRPN(std::string string, std::queue<char> &que) {
     return true;
 }
 
-double RPNToDouble(std::queue<char> que) {
+double rpnToDouble(std::queue<char> que) {
     std::stack<double> stack;
 
     while (!que.empty()) {
@@ -130,13 +143,14 @@ int main() {
 
     for (int i = 0; i < n; i++) {
         std::getline(std::cin, string);
-        cor[i] = infToRPN(string,que[i]);
+        cor[i] = toRPN(string,que[i]);
     }
     for (int i = 0; i < n; i++){
         if (!cor[i]){
             std::cout << "BLAD";
-        }else
-            std::cout << RPNToDouble(que[i]);
+        }else{
+            std::cout << rpnToDouble(que[i]);
+        }
         std::cout << "\n";
     }
 
