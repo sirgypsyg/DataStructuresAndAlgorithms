@@ -1,119 +1,10 @@
 #include <iostream>
 #include <string>
+#include <queue>
+#include <stack>
 
-template <typename T>
-class Stack {
-private:
-    T* elements;    
-    size_t capacity; 
-    size_t size;     
-
-public:
-    Stack() : capacity(10), size(0) {
-        elements = new T[capacity];
-    }
-
-    ~Stack() {
-        delete[] elements;
-    }
-
-    void push(const T& value) {
-        if (size == capacity) {
-            resize();
-        }
-        elements[size++] = value;
-    }
-
-    void pop() {
-        if (!empty()) {
-            --size;
-        }
-    }
-
-    T top() const {
-        if (!empty()) {
-            return elements[size - 1];
-        } else {
-            throw std::out_of_range("Stack is empty");
-        }
-    }
-
-    bool empty() const {
-        return size == 0;
-    }
-
-    size_t getSize() const {
-        return size;
-    }
-
-private:
-    void resize() {
-        capacity *= 2;
-        T* newElements = new T[capacity];
-        for (size_t i = 0; i < size; ++i) {
-            newElements[i] = elements[i];
-        }
-        delete[] elements;
-        elements = newElements;
-    }
-};
-
-class Queue{
-    private:
-        char *tab;
-        int head, tail;
-        int size;
-    public:
-        Queue(){
-            head = tail = 0;
-            size = 100;
-            tab = new char[size];
-        }
-
-        bool empty(){
-            return head == tail ? true : false;
-        }
-
-        void deallocateMemory() {
-        delete[] tab;
-        }
-
-
-        char pop(){
-            char temp = tab[head];
-            head = (head+1)%size;
-            return temp;
-        }
-
-        void push(char element){
-            tab[tail] = element;
-            tail = (tail+1) % size;
-            if (head == tail)
-            {
-                int i = 0;
-                char *temp_tab = new char[2 * size];
-                do
-                {
-                    temp_tab[i] = tab[head];
-                    head = (head + 1)% size;
-                    ++i;
-                } while (head != tail);
-                
-                delete[] tab;
-                tab = temp_tab;
-                head = 0;
-                tail = size;
-                size *= 2;                
-            }
-        }
-
-        void clear(){
-            head = tail = 0;
-        }
-};
-
-void infToRPN(std::string string, Queue &que) {
-    Stack<char> stack;
+bool infToRPN(std::string string, std::queue<char> &que) {
+    std::stack<char> stack;
     int i = 0;
     int size = string.size();
     
@@ -124,11 +15,15 @@ void infToRPN(std::string string, Queue &que) {
             que.push(e);
             if (i < size - 1)
             {
-                while (isdigit(string.at(i+1)))
+                bool changed = false;
+                while (isdigit(string.at(i+1))) 
                 {
                     que.push(string.at(i+1));
                     ++i;
+                    changed = true;
                 }    
+                if (changed)
+                    --i;
             }
             que.push(';');
         }
@@ -141,35 +36,17 @@ void infToRPN(std::string string, Queue &que) {
                 stack.pop();
             }
             if (stack.empty() || stack.top() != '[' && stack.top() != '{' && stack.top() != '('){
-                que.clear();
-                return;
+                return false;
             }
             stack.pop();
         } else if (e == '+' || e == '-') {
-            if (i < size - 1)
-            {
-                char e1 = string.at(i+1);
-                if (e1 == '+' || e1 == '-' || e1 == '/' || e1 == '*'){
-                    que.clear();
-                    return;
-                }
-            }
             while (!stack.empty() && stack.top() != '[' && stack.top() != '{' && stack.top() != '(') {
                 que.push(stack.top());
                 stack.pop();
             }
             stack.push(e);
         } else if (e == '*' || e == '/') {
-            if (i < size - 1)
-            {
-                char e1 = string.at(i+1);
-                if (e1 == '+' || e1 == '-' || e1 == '/' || e1 == '*'){
-                    que.clear();
-                    return;
-                }
-            }
-            
-            while (!stack.empty() && (stack.top() == '+' || stack.top() == '-' ||stack.top() == '*' || stack.top() == '/')) {
+            while (!stack.empty() && (stack.top() == '*' || stack.top() == '/')) {
                 que.push(stack.top());
                 stack.pop();
             }
@@ -180,28 +57,28 @@ void infToRPN(std::string string, Queue &que) {
 
     while (!stack.empty()) {
         if (stack.top() == '[' || stack.top() == '{' || stack.top() == '(')
-        {
-            que.clear();
-            return;
-        }
+            return false;
         
         que.push(stack.top());
         stack.pop();
     }
+    return true;
 }
 
-double RPNToInt(Queue que) {
-    Stack<double> stack;
+double RPNToDouble(std::queue<char> que) {
+    std::stack<double> stack;
 
     while (!que.empty()) {
-        char e = que.pop();
+        char e = que.front();
+        que.pop();
 
         if (isdigit(e)) {
             std::string a;
             a += e;
             char e1;
             while (1) {
-                e1 = que.pop();
+                e1 = que.front();
+                que.pop();
                 if (isdigit(e1))
                     a += e1;
                 else
@@ -211,33 +88,29 @@ double RPNToInt(Queue que) {
             stack.push(numericValue);
         } else {
             if (e == '+') {
-                double valB = stack.top();
+                double b = stack.top();
                 stack.pop();
-                double valA = stack.top();
+                double a = stack.top();
                 stack.pop();
-                double result = valA + valB;
-                stack.push(result);
+                stack.push(a + b);
             } else if (e == '*') {
-                double valB = stack.top();
+                double b = stack.top();
                 stack.pop();
-                double valA = stack.top();
+                double a = stack.top();
                 stack.pop();
-                double result = valA * valB;
-                stack.push(result);
+                stack.push(a * b);
             } else if (e == '/') {
-                double valB = stack.top();
+                double b = stack.top();
                 stack.pop();
-                double valA = stack.top();
+                double a = stack.top();
                 stack.pop();
-                double result = valA / valB; 
-                stack.push(result);
+                stack.push(a / b);
             } else if (e == '-') {
-                double valB = stack.top();
+                double b = stack.top();
                 stack.pop();
-                double valA = stack.top();
+                double a = stack.top();
                 stack.pop();
-                double result = valA - valB;
-                stack.push(result);
+                stack.push(a - b);
             }
         }
     }
@@ -252,20 +125,21 @@ int main() {
     std::cin >> n;
     std::cin.ignore();
     std::string string;
-    Queue que[n];
+    std::queue<char> que[n];
+    bool cor[n];
 
     for (int i = 0; i < n; i++) {
         std::getline(std::cin, string);
-        infToRPN(string,que[i]);
+        cor[i] = infToRPN(string,que[i]);
     }
     for (int i = 0; i < n; i++){
-        if (que[i].empty()){
+        if (!cor[i]){
             std::cout << "BLAD";
         }else
-            std::cout << RPNToInt(que[i]);
+            std::cout << RPNToDouble(que[i]);
         std::cout << "\n";
-        que[i].deallocateMemory();
     }
 
     return 0;
 }
+
