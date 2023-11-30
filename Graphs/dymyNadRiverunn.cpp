@@ -3,19 +3,21 @@
 #include <vector>
 #include <algorithm>
 
-void BFS(std::vector<std::vector<int> > graph, int n, int s, int d){
+void BFS(std::vector<std::vector<int> > &graph, int n, int s, int d){
   bool visited[n];
   std::fill(visited, visited + n, false);
 
-  std::queue<int> que;
+  int dist[n];
+  std::fill(dist, dist + n, 0);
 
+  std::queue<int> que;
+  
   que.push(s);
   visited[s] = true;
 
-  int maxDist = 0;
-  int dist = 0;
+  int counter = 0;
+  int curMax = 0;
   while (!que.empty()){
-    bool change = false;
     int head = que.front();
     int edges = graph[head].size();
     que.pop();
@@ -25,14 +27,20 @@ void BFS(std::vector<std::vector<int> > graph, int n, int s, int d){
 
       if (!visited[value]){
         visited[value] = true;
+        dist[value] = dist[head] + 1;
+
+        if (dist[value] <= d/2)
+          ++counter;
+        
+        if(curMax < dist[value]) 
+          curMax=dist[value];
+          
         que.push(value);
-        change = true;
-        if (maxDist < d/2) ++dist;
       }
     }
-    if (change) ++maxDist;
+
   }
-  std::cout << maxDist << " " <<  dist;
+  std::cout << curMax << " " <<  counter;
 }
 
 int main(){
@@ -53,7 +61,5 @@ int main(){
 
     BFS(graph, n, s, d);
  
-
-
     return 0;
 }

@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/kuba/cpp/DataStructuresAndAlgorithms",
-      "program": "/Users/kuba/cpp/DataStructuresAndAlgorithms/build/Debug/outDebug"
+      "cwd": "/Users/kuba/cpp/DataStructuresAndAlgorithms/Graphs",
+      "program": "/Users/kuba/cpp/DataStructuresAndAlgorithms/Graphs/build/Debug/outDebug"
     }
   ]
 }
