@@ -1,17 +1,11 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <climits>
+    #include <iostream>
+    #include <vector>
+    #include <queue>
 
     struct Vert {
-        int x, y;
-        int mPoints;
-        int dist;
-
-        Vert() : x(0), y(0), mPoints(0), dist(INT_MAX) {}
-
-        Vert(int xVal, int yVal, int mPointsVal, int distVal)
-        : x(xVal), y(yVal), mPoints(mPointsVal), dist(distVal) {}
+        int x = 0, y = 0;
+        int mPoints = 0;
+        int dist = INT_MAX;
     };
 
     struct VertComparator {
@@ -45,11 +39,7 @@
 
         std::priority_queue<Vert, std::vector<Vert>, VertComparator> q;
         std::vector<std::vector<Vert> > v(n, std::vector<Vert>(m));
-        v[startX][startY].x = startX;
-        v[startX][startY].y = startY;
-        v[startX][startY].mPoints = 0;
-        v[startX][startY].dist = 0;
-        v[startX][startY] = Vert(startX, startY, 0, 0);
+        v[startX][startY] = {startX, startY , 0, 0};   
 
         q.push(v[startX][startY]);
 
@@ -68,20 +58,18 @@
                 int newX = x + dx[i];
                 int newY = y + dy[i];
 
-                //SM    que:  . , M, 
-                //.X
                 if (isValid(newX, newY, n, m) && v[newX][newY].dist == INT_MAX && map[newX][newY] != '#') {
                     switch (whatField(map[newX][newY]))
                     {
                     case 0: // monitored 
-                        v[newX][newY] = Vert(newX,newY, current.mPoints + 1, current.dist + 1); 
+                        v[newX][newY] = {newX,newY, current.mPoints + 1, current.dist + 1};   
                         q.push(v[newX][newY]);
                         break;
                     case 1: // X = END
                         std::cout << current.dist + 1 << " " << current.mPoints;
                         return;
                     case 2: // .
-                        v[newX][newY] = Vert(newX,newY, current.mPoints, current.dist + 1);   
+                        v[newX][newY] = {newX,newY, current.mPoints, current.dist + 1};   
                         q.push(v[newX][newY]);
                         break;
                     }
