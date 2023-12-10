@@ -45,10 +45,6 @@
 
         std::priority_queue<Vert, std::vector<Vert>, VertComparator> q;
         std::vector<std::vector<Vert> > v(n, std::vector<Vert>(m));
-        v[startX][startY].x = startX;
-        v[startX][startY].y = startY;
-        v[startX][startY].mPoints = 0;
-        v[startX][startY].dist = 0;
         v[startX][startY] = Vert(startX, startY, 0, 0);
 
         q.push(v[startX][startY]);

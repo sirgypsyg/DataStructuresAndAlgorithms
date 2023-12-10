@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 
+
 void BFS(std::vector<std::vector<int> > &graph, int n, int s, int d){
   bool visited[n];
   std::fill(visited, visited + n, false);

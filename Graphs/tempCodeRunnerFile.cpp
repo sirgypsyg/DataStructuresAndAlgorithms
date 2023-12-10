@@ -1,106 +1,89 @@
-    #include <iostream>
-    #include <vector>
-    #include <queue>
+#include <iostream>
+#include <vector>
+#include <utility>
+#include <set>
 
-    struct Vert {
-        int x = 0, y = 0;
-        int mPoints = 0;
-        int dist = INT_MAX;
-    };
+#define inf INT_MAX
+#define pair std::pair<int,int>
 
-    struct VertComparator {
-        bool operator()(const Vert& v1, const Vert& v2) const {
-            if (v1.dist > v2.dist || (v1.dist == v2.dist && v1.mPoints > v2.mPoints))
-                return true;
-            return false;
+struct G {
+    std::vector<pair> adj;
+    std::vector<int> occupiedAtMin;
+    int dist = inf;
+} *node;
+
+void dijkstra(int start) {
+    int curDist, a, b;
+    node[start].dist = 0;
+
+    std::set<pair> edges;
+
+    edges.insert(std::make_pair(0, start));
+
+    while (!edges.empty()) {
+        curDist = edges.begin()->first;
+        b = edges.begin()->second;
+        node[b].dist = std::min(curDist, node[b].dist);
+        if (b == 0) {
+            std::cout << node[b].dist << "\n";
+            return;
         }
-    };
 
-    bool isValid(int x, int y, int n, int m) {
-        return x >= 0 && x < n && y >= 0 && y < m;
-    }
+        edges.erase(edges.begin());
 
-    int whatField(char cell) {
-        switch (cell)
-        {
-        case 'M':
-            return 0;
-        case 'X':
-            return 1;
-        case '.':
-            return 2;
-        }
-        return 0;
-    }
-
-    void bfs(std::vector<std::vector<char> > &map, int startX, int startY) {
-        int n = map.size();
-        int m = map[0].size();
-
-        std::priority_queue<Vert, std::vector<Vert>, VertComparator> q;
-        std::vector<std::vector<Vert> > v(n, std::vector<Vert>(m));
-        v[startX][startY] = {startX, startY , 0, 0};   
-
-        q.push(v[startX][startY]);
-
-        while (!q.empty()) {
-            Vert current = q.top();
-            q.pop();
-
-            int x = current.x;
-            int y = current.y;
-
-            // adj edges
-            int dx[] = {-1, 0, 1, 0}; // move vertically
-            int dy[] = {0, 1, 0, -1}; // move horizontally
-
-            for (int i = 0; i < 4; ++i) {
-                int newX = x + dx[i];
-                int newY = y + dy[i];
-
-                if (isValid(newX, newY, n, m) && v[newX][newY].dist == INT_MAX && map[newX][newY] != '#') {
-                    switch (whatField(map[newX][newY]))
-                    {
-                    case 0: // monitored 
-                        v[newX][newY] = {newX,newY, current.mPoints + 1, current.dist + 1};   
-                        q.push(v[newX][newY]);
-                        break;
-                    case 1: // X = END
-                        std::cout << current.dist + 1 << " " << current.mPoints;
-                        return;
-                    case 2: // .
-                        v[newX][newY] = {newX,newY, current.mPoints, current.dist + 1};   
-                        q.push(v[newX][newY]);
-                        break;
+        for (int i = 0; i < node[b].adj.size(); i++) {
+            if (node[node[b].adj[i].first].dist == inf) {
+                int plusDist = node[b].adj[i].second + curDist;
+                if (!node[node[b].adj[i].first].occupiedAtMin.empty()) {
+                    int size = node[node[b].adj[i].first].occupiedAtMin.size();
+                    int it = 0;
+                    while (size - it > 0) {
+                        if (node[node[b].adj[i].first].occupiedAtMin[it] == plusDist)
+                            ++plusDist;
+                        ++it;
                     }
                 }
+                edges.insert(std::make_pair(plusDist, node[b].adj[i].first));
             }
         }
     }
+}
 
-    int main() {
-        int n, m;
-        std::cin >> n >> m;
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+    int d, n, m, s;
 
-        std::vector<std::vector<char> > map(n, std::vector<char>(m));
+    std::cin >> d;
 
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < m; ++j) {
-                std::cin >> map[i][j];
+    for (int i = 0; i < d; ++i) {
+        std::cin >> n >> m >> s;
+        node = new G[n];
+
+        for (int j = 0; j < m; ++j) {
+            int x, y, w;
+            std::cin >> x >> y >> w;
+            node[x].adj.push_back(std::make_pair(y, w));
+            node[y].adj.push_back(std::make_pair(x, w));
+        }
+
+        for (int j = 0; j < n; j++) {
+            int k;
+            int min;
+            std::cin >> k;
+            if (k == 0)
+                continue;
+            for (int l = 0; l < k; l++) {
+                std::cin >> min;
+                node[j].occupiedAtMin.push_back(min);
             }
         }
 
-        int startX, startY;
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < m; ++j) {
-                if (map[i][j] == 'S') {
-                    startX = i;
-                    startY = j;
-                }
-            }
-        }
-
-        bfs(map, startX, startY);
-
-        return 0;
+        dijkstra(s);
     }
+
+    delete[] node;
+
+    return 0;
+}
