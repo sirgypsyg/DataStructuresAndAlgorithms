@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/kuba/cpp/DataStructuresAndAlgorithms/Graphs",
-      "program": "/Users/kuba/cpp/DataStructuresAndAlgorithms/Graphs/build/Debug/outDebug"
+      "cwd": "/Users/kuba/cpp/DataStructuresAndAlgorithms/GreedyAndDynamic",
+      "program": "/Users/kuba/cpp/DataStructuresAndAlgorithms/GreedyAndDynamic/build/Debug/outDebug"
     }
   ]
 }
