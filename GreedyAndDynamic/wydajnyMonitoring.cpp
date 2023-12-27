@@ -1,11 +1,10 @@
 #include <iostream>
-#include <queue>
 #include <vector>
 #include <algorithm>
 #include <utility>
 
 bool fun(std::vector<std::pair<int,int>> room){
-    int n = room.size();
+    int n = room.size(); 
 
     bool column[n];
     std::fill(column, column + n, false);
@@ -13,8 +12,7 @@ bool fun(std::vector<std::pair<int,int>> room){
     for (int i = 0; i < n; i++)
     {
         bool change = false;
-        for (int j = room[i].first; j <= room[i].second; j++)
-        {
+        for (int j = room[i].first; j <= room[i].second; j++){
             if (column[j] == true)
                 continue;
             else{
@@ -35,20 +33,22 @@ int main(){
     std::cout.tie(nullptr);
     int t, n;
     std::cin >> t;
+    std::vector<std::pair<int,int>> room
 
     for (int i = 0; i < t; i++)
     {
         std::cin >> n;
-        std::vector<std::pair<int,int>> room;
+        
         int temp1 , temp2;
-        for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
             std::cin >> temp1 >> temp2;
             room.push_back(std::make_pair(temp1,temp2));
         }
-        std::stable_sort(room.begin(), room.end(), [](std::pair<int,int> a, std::pair<int,int> b) {
+        std::sort(room.begin(), room.end(), [](std::pair<int,int> a, std::pair<int,int> b) {
         return a.second < b.second;});
 
-        std::cout << (fun(room) == true ? "TAK" : "NIE");
+        std::cout << (fun(room) ? "TAK" : "NIE") << "\n";
+        room.clear();
     }
     
 
