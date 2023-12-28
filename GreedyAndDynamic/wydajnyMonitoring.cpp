@@ -33,7 +33,7 @@ int main(){
     std::cout.tie(nullptr);
     int t, n;
     std::cin >> t;
-    std::vector<std::pair<int,int>> room
+    std::vector<std::pair<int,int>> room;
 
     for (int i = 0; i < t; i++)
     {
